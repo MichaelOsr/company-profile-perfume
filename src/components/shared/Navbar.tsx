@@ -2,22 +2,22 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react'
 import { Button } from '../ui/button';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 export default function Navbar({children}:React.PropsWithChildren){
     const [isOpen, setIsOpen] = useState(false);
 
     const navLinks = [
-        { name: 'About Us', href: 'about-us' },
-        { name: 'Products', href: 'products' },
-        { name: 'Teams', href: 'teams' },
-        { name: 'Blog', href: 'blog' },
+        { name: 'About Us', href: '/about-us' },
+        { name: 'Products', href: '/products' },
+        { name: 'Teams', href: '/teams' },
+        { name: 'Blog', href: '/blog' },
       ];
 
     return (
         <>
-            <nav className='sticky w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm'>
+            <nav className='sticky w-full top-0 z-50 bg-white/85 backdrop-blur-md border-b border-white/20 shadow-sm'>
                 <div className='flex justify-between items-center px-5 py-2 md:px-10 md:py-4'>
                     <div className='flex justify-between items-center w-full'>
 
@@ -32,12 +32,12 @@ export default function Navbar({children}:React.PropsWithChildren){
                         <div className='space-x-3 hidden md:flex'>
                             {
                                 navLinks.map((item) => (
-                                    <Link 
+                                    <NavLink 
                                     key={item.name}
                                     to={item.href}
-                                    className='text-slate-400 text-lg hover:text-amber-300'>
+                                    className={({ isActive }) => isActive ? 'text-amber-400 text-lg font-bold' : 'text-slate-400 text-lg hover:text-amber-300'}>
                                         {item.name}
-                                    </Link>
+                                    </NavLink>
                                 ))
                             }
                         </div>
@@ -55,14 +55,14 @@ export default function Navbar({children}:React.PropsWithChildren){
                     <div className='md:hidden'>
                             {
                                 navLinks.map((item)=> (
-                                    <Link
+                                    <NavLink
                                     key={item.name}
                                     to={item.href}
                                     className='bg-amber-400 text-amber-50 font-bold block text-center p-2'
                                     onClick={() => setIsOpen(false)} 
                                     >
                                         {item.name}
-                                    </Link>
+                                    </NavLink>
                                 ))
                             }
                     </div>

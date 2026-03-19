@@ -1,11 +1,11 @@
-import luxuriousElixir from '../assets/luxurious elixir.png'
-import expertise from '../assets/expertise.png'
-import bottleLeaf from '../assets/bottle-leaf.png'
-import midnigh from '../assets/midnight oud.png'
+import luxuriousElixir from '@/assets/luxurious elixir.png'
+import expertise from '@/assets/expertise.png'
+import bottleLeaf from '@/assets/bottle-leaf.png'
+import midnigh from '@/assets/midnight oud.png'
 
 import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
-import { Card, CardFooter, CardHeader, CardContent } from '@/components/ui/card'
+import { Card, CardFooter, CardHeader} from '@/components/ui/card'
 
 import { useState, useEffect }from "react"
 import {
@@ -151,7 +151,7 @@ export default function Home () {
 
                     <motion.div initial={{opacity:0, y:-20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8}}  className='flex justify-center items-center'>
                         <Card>
-                            <img src={midnigh} alt="midnight oud" />
+                            <img className='max-h-72' src={midnigh} alt="midnight oud" />
                             <CardHeader>
                                 <h1>Midnight Oud</h1>
                                 <p>A mysterious blend of rare Agarwood, smoked leather, and wild damask rose. Intense, seductive, and timeless.</p>
