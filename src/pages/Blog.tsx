@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"; // Pastikan menggunakan react-router-do
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import Backendless from "@/lib/backendless"; // Import konfigurasi backendless kamu
-import { Loader2, Trash2, Edit, Eye } from "lucide-react";
+import { Loader2, Eye } from "lucide-react";
 
 // Definisikan interface sesuai skema gambar sebelumnya
 interface BlogData {
