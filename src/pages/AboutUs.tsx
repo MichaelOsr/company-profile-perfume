@@ -53,18 +53,18 @@ export default function AboutUs () {
                             <h1 className='text-2xl lg:text-3xl font-light'>A decade of redefining</h1>
                             <span className='text-2xl lg:text-3xl font-bold'>modern luxury.</span>
                         </div>
-                        <div className="text-slate-600 text-xs grid grid-cols-1 gap-4">
-                            <p >Founded in 2014 by master perfumer Julian Vance, Elixir began as a small boutique laboratory in the heart of Grasse, France. Our mission was simple yet ambitious: to return to the roots of high-perfumery while embracing a contemporary, minimalist aesthetic.</p>
+                        <div className="text-slate-600 text-xs md:text-sm lg:text-lg grid grid-cols-1 gap-4">
+                            <p>Founded in 2014 by master perfumer Julian Vance, Elixir began as a small boutique laboratory in the heart of Grasse, France. Our mission was simple yet ambitious: to return to the roots of high-perfumery while embracing a contemporary, minimalist aesthetic.</p>
                             <p>What started as a collection of three signature scents has evolved into a global symbol of understated elegance. We believe that a fragrance should not precede the wearer, but rather whisper their story to those close enough to listen.</p>
                         </div>
                         <div className="grid grid-cols-2">
-                            <div className="text-slate-600 text-xs">
-                                <span className="font-bold text-xl text-slate-950">2014</span>
-                                <p>The First Laboratory</p>
+                            <div className="text-slate-600">
+                                <span className="font-bold text-xl md:text-2xl text-slate-950">2014</span>
+                                <p className='text-xs md:text-sm'>The First Laboratory</p>
                             </div>
-                            <div className="text-slate-600 text-xs">
-                                <span className="font-bold text-xl text-slate-950">2018</span>
-                                <p>Global Flagship Launch</p>
+                            <div className="text-slate-600 text-xs md:text-sm">
+                                <span className="font-bold text-xl md:text-2xl text-slate-950">2018</span>
+                                <p className='text-xs md:text-sm'>Global Flagship Launch</p>
                             </div>
                         </div>
                     </motion.div>

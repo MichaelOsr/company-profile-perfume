@@ -72,7 +72,7 @@ export default function Navbar({children}:React.PropsWithChildren){
                 {children}
             </div>
             {/* Footer */}
-            <section className='bg-slate-900'>
+            <section className='bg-slate-900 bottom-0'>
                 <div className='container max-w-5xl px-4 py-12 mx-auto md:px-8 grid grid-cols-1 gap-5 md:flex md:justify-between md:items-center'>
                     <div className='space-y-5 md:w-1/2'>
                         <div className='flex flex-col justify-start items-center max-w-fit'>
