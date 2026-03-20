@@ -56,11 +56,6 @@ export default function DashboardBlog() {
       }
     };
   
-    // 3. Fungsi Edit Blog
-    const handleEdit = (id: number) => {
-      // Navigasi ke halaman edit dengan ID blog tersebut
-      navigate(`/edit-blog/${id}`);
-    };
 
   const handleLogout = async () => {
     try {
@@ -77,15 +72,15 @@ export default function DashboardBlog() {
     <>
       <section className="bg-amber-50">
         <div className="container px-8 py-12 mx-auto max-w-7xl md:px-12">
-          <div className="text-center space-y-3">
-            <h1 className="font-bold text-2xl lg:text-4xl">Dashboard Blog</h1>
+          <div className="space-y-3 text-center">
+            <h1 className="text-2xl font-bold lg:text-4xl">Dashboard Blog</h1>
           </div>
         </div>
       </section>
 
       <section>
-        <div className="container px-8 py-12 mx-auto max-w-7xl md:px-12 grid grid-cols-1 gap-8">
-          <div className="flex justify-between items-center">
+        <div className="container grid grid-cols-1 gap-8 px-8 py-12 mx-auto max-w-7xl md:px-12">
+          <div className="flex items-center justify-between">
             <Button asChild>
               <Link to='/create-blog'>+ New Post</Link>
             </Button>
@@ -95,22 +90,22 @@ export default function DashboardBlog() {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center h-40">
+            <div className="flex items-center justify-center h-40">
               <Loader2 className="animate-spin text-amber-600" size={40} />
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {blogs.map((blog) => (
-                <Card key={blog.id} className="overflow-hidden flex flex-col shadow-md">
+                <Card key={blog.id} className="flex flex-col overflow-hidden shadow-md">
                   
                     <img 
                       src={blog.image} 
                       alt={blog.tittle} 
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                     />
                   
                   <CardHeader>
-                    <p className="text-slate-400 text-xs">
+                    <p className="text-xs text-slate-400">
                       {new Date(blog.created).toLocaleDateString('id-ID', {
                         year: 'numeric',
                         month: 'long',
@@ -122,11 +117,11 @@ export default function DashboardBlog() {
                   </CardHeader>
                   <CardContent className="grow">
                     <div 
-                      className="line-clamp-3 text-xs text-slate-500"
+                      className="text-xs line-clamp-3 text-slate-500"
                       dangerouslySetInnerHTML={{ __html: blog.content }}
                     />
                   </CardContent>
-                  <CardFooter className="flex justify-between items-center gap-2 border-t pt-4">
+                  <CardFooter className="flex items-center justify-between gap-2 pt-4 border-t">
                     <Button variant="outline" size="sm" asChild className="flex-1">
                       <Link to={`/blog/${blog.id}`} target="_blank">
                         <Eye size={14} className="mr-1" /> View
@@ -149,7 +144,7 @@ export default function DashboardBlog() {
           )}
 
           {!isLoading && blogs.length === 0 && (
-            <div className="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed">
+            <div className="py-20 text-center border-2 border-dashed bg-gray-50 rounded-xl">
               <p className="text-gray-400">Belum ada artikel. Mulai menulis sekarang!</p>
             </div>
           )}
