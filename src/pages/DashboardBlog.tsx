@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import Backendless from "@/lib/backendless"; // Import konfigurasi backendless kamu
-import { Loader2, Trash2, Edit, Eye } from "lucide-react";
+import { Loader2, Trash2, Eye } from "lucide-react";
 
 // Definisikan interface sesuai skema gambar sebelumnya
 interface BlogData {
@@ -131,16 +131,6 @@ export default function DashboardBlog() {
                       <Link to={`/blog/${blog.id}`} target="_blank">
                         <Eye size={14} className="mr-1" /> View
                       </Link>
-                    </Button>
-
-                    {/* Tombol Edit */}
-                    <Button 
-                      variant="secondary" 
-                      size="sm" 
-                      className="bg-blue-500 text-white hover:bg-blue-600 flex-1"
-                      onClick={() => handleEdit(blog.id)}
-                    >
-                      <Edit size={14} className="mr-1" /> Edit
                     </Button>
 
                     {/* Tombol Delete */}
