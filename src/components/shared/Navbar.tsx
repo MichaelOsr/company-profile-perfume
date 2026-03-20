@@ -92,12 +92,12 @@ export default function Navbar({children}:React.PropsWithChildren){
                             <div className='grid grid-cols-1 gap-2 mt-5'>
                                 {
                                     navLinks.map((item) => (
-                                        <Link
+                                        <NavLink
                                         key={item.name}
                                         to={item.href}
                                         className='text-slate-400 text-xs md:text-sm'>
                                         {item.name}
-                                        </Link>
+                                        </NavLink>
                                     ))
                                 }
                             </div>

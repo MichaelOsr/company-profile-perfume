@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Linkedin } from "lucide-react";
 import { useEffect } from 'react';
 import { useTeamStore } from '../store/useTeamStore';
+import { Link } from "react-router";
 export default function Teams () {
     const { persons, teamDescriptions, loading, error, fetchTeams } = useTeamStore();
 
@@ -26,15 +27,17 @@ export default function Teams () {
                     {
                         persons.map((item, idx) => (
                             <div key={idx}>
-                                <Card className="flex flex-col justify-center items-center">
+                                <Card className="flex flex-col justify-center items-center h-full">
                                     <div className="h-25 w-25 border rounded-full flex justify-center items-center">
                                         <img src={item.picture.large} alt={item.name.first} className="rounded-full w-full" />
                                     </div>
                                     <div className="text-center p-5 flex flex-col justify-center items-center">
                                         <span className="font-bold">{`${item.name.first} ${item.name.last}`}</span>
                                         <p className="text-amber-400">{teamDescriptions[idx].position}</p>
-                                        <p className="text-xs italic text-slate-500 mt-4">{teamDescriptions[idx].description}</p>
-                                        <Linkedin className="text-slate-400 hover:text-amber-400 mt-4"/>
+                                        <p className="text-xs italic text-slate-500 mt-4 h-10">{teamDescriptions[idx].description}</p>
+                                        <Link to='#'>
+                                            <Linkedin className="text-slate-400 hover:text-amber-400 mt-4"/>
+                                        </Link>
                                     </div>
                                 </Card>
                             </div>

@@ -83,7 +83,7 @@ export default function Products () {
             </section>
 
             <section className="bg-[#1a1a1a]">
-                    <div className="px-8 py-12 mx-auto max-w-7xl md:px-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
+                    <div className="container px-8 py-12 mx-auto max-w-7xl md:px-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
                         <motion.div initial={{opacity:0, y:-20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8}} className="grid grid-cols-1 gap-5">
                             <h1 className="text-slate-50 text-xl font-extrabold md:text-5xl">Tailored Fragrance Experience</h1>
                             <p className="text-slate-400 text-sm md:text-lg">Beyond our core collection, we offer exclusive services designed to elevate your personal olfactory journey. Experience the pinnacle of luxury perfumery.</p>
