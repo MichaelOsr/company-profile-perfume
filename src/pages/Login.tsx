@@ -16,7 +16,11 @@ export default function Login() {
 
         try {
             const user = await Backendless.UserService.login(username, password, true); // true = stayLoggedIn
-            localStorage.setItem('token', user['user-token']);
+            const token = (user as { 'user-token'?: string })['user-token'];
+
+            if (token) {
+                localStorage.setItem('token', token);
+            }
             navigate('/dashboard');
         } catch (error: any) {
             alert("Login Gagal: " + error.message);
