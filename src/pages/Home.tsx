@@ -171,7 +171,7 @@ export default function Home () {
             <section className='bg-amber-50'>
                 <div className='container max-w-5xl px-4 py-12 mx-auto md:px-8'>
                     <Quote className='text-amber-400 mx-auto mb-5'/>
-                    <div className="mx-auto max-w-[10rem] md:max-w-[25rem]">
+                    <div className="mx-auto max-w-40 md:max-w-100">
                         <Carousel setApi={setApi} className="w-full ">
                             <CarouselContent>
                                     <CarouselItem>

@@ -47,7 +47,7 @@ export default function AboutUs () {
 
             <section className="bg-slate-50">
                 <div className="container max-w-7xl px-8 py-14 mx-auto items-center grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-10">
-                    <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8}}  className="grid grid-cols-1 gap-5">
+                    <motion.div initial={{opacity:0, y:-20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8}}  className="grid grid-cols-1 gap-5">
                         <span className='text-amber-400 text-[10px] lg:text-sm font-semibold tracking-[0.3em] italic'>OUR STORY</span>
                         <div className="max-w-44 md:max-w-fit">
                             <h1 className='text-2xl lg:text-3xl font-light'>A decade of redefining</h1>
@@ -69,7 +69,7 @@ export default function AboutUs () {
                         </div>
                     </motion.div>
 
-                    <motion.div initial={{opacity:0, y:-20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8}}>
+                    <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8}}>
                         <img className='rounded-xl' src={luxury} alt="modernluxury" />
                     </motion.div>
                 </div>
@@ -118,7 +118,7 @@ export default function AboutUs () {
                         {
                             stackHolders.map((item, idx) => (
                                 <motion.div key={item.name} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} transition={{duration:0.8, delay:idx*0.1}}>
-                                    <Card className='overflow-hidden h-full'>
+                                    <Card className='overflow-hidden h-full hover:-translate-y-2 hover:shadow-xl transition-all'>
                                         <img className='grayscale-100 hover:grayscale-0 hover:scale-105 transition-all duration-500' src={item.photo} alt="julian" />
                                         <CardHeader>
                                             <span className='text-lg font-semibold'>{item.name}</span>
