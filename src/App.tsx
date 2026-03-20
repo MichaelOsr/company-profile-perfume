@@ -11,6 +11,7 @@ import DashboardBlog from './pages/DashboardBlog';
 import CreateBlog from './pages/CreateBlog';
 import Login from './pages/Login';
 import ProtectedRoute from './auth/ProtectedRoute';
+import PublicRoute from './auth/PublicRoute';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -23,6 +24,18 @@ function ScrollToTop() {
 }
 
 function App() {
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        // Mengecek apakah token di local storage masih valid di server Backendless
+        await Backendless.UserService.isValidLogin();
+      } catch {
+        localStorage.removeItem('token');
+      }
+    };
+    checkLogin();
+  }, []);
+
   return (
     <Router>
       <Navbar>
@@ -35,7 +48,10 @@ function App() {
           <Route path="/teams" element={<Teams />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
-          <Route path="/login" element={<Login />} />
+          
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
 
           {/* Protected Routes - Hanya untuk yang sudah login */}
           <Route element={<ProtectedRoute />}>

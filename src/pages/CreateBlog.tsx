@@ -1,150 +1,162 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css'; // Theme editor
-import { Save, X, Image as ImageIcon, Send } from 'lucide-react';
-import { Link } from 'react-router';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import 'react-quill-new/dist/quill.snow.css';
+import Backendless from '../lib/backendless';
+import { Link, useNavigate } from 'react-router';
+import { Save, Image as ImageIcon, User, Type, Upload, X } from 'lucide-react';
 
 const CreateBlog: React.FC = () => {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [tittle, setTittle] = useState('');
+  const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
-  const [coverImage, setCoverImage] = useState<string | null>(null);
+  
+  // State untuk mengelola file gambar
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Konfigurasi Toolbar WYSIWYG
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      ['blockquote', 'code-block'],
-      ['link', 'image'],
-      ['clean']
-    ],
+  // Handle saat user memilih file
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Untuk menampilkan preview lokal sebelum upload
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { title, category, content, coverImage };
-    console.log("Data Blog Baru:", payload);
-    alert("Blog berhasil disimpan! Cek console.");
+    if (!selectedFile) return alert("Silakan pilih gambar terlebih dahulu");
+    
+    setIsLoading(true);
+
+    try {
+      // TAHAP 1: Upload file ke Backendless File Service
+      // File akan disimpan di folder /blog-images/
+      const uploadResult = await Backendless.Files.upload(selectedFile, "blog-images", true);
+      const uploadedImageUrl = uploadResult.fileURL;
+
+      // TAHAP 2: Simpan data blog ke tabel 'Blog' dengan URL dari hasil upload
+      const payload = {
+        tittle: tittle,
+        author: author,
+        content: content,
+        image: uploadedImageUrl // URL hasil upload disimpan di sini
+      };
+
+      await Backendless.Data.of("Blog").save(payload);
+      
+      alert("Blog berhasil dipublish dengan gambar!");
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error("Error:", error);
+      alert("Terjadi kesalahan: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
-      {/* Top Navigation Bar */}
-      <nav className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <X className="w-5 h-5 text-gray-500" />
-            </Link>
-            <h1 className="text-lg font-semibold text-gray-800">Create New Post</h1>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              onClick={handleSubmit}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-shadow shadow-sm"
-            >
-              <Send className="w-4 h-4" />
-              Publish
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200">
+        
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-20">
+          <Link to='/dashboard'>
+            <X/>
+          </Link>
+          <h1 className="text-xl font-bold text-gray-800">Tulis Artikel Baru</h1>
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading || !tittle || !selectedFile}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:bg-gray-400"
+          >
+            {isLoading ? "Memproses..." : <><Save size={18} /> Publish</>}
+          </button>
         </div>
-      </nav>
 
-      <main className="max-w-4xl mx-auto mt-8 px-4">
-        <form className="space-y-6">
-          {/* Cover Image Upload Area */}
-          <div className="relative group w-full h-64 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center overflow-hidden transition-all hover:border-blue-400">
-            {coverImage ? (
-              <>
-                <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
-                <button 
-                  type="button"
-                  onClick={() => setCoverImage(null)}
-                  className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <div className="text-center">
-                <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 font-medium">Add a cover image</p>
-                <Input 
-                  type='file'
-                  className="mt-4 px-3 py-1 text-xs border rounded-md outline-none focus:ring-1 ring-blue-500"
-                  onChange={(e) => setCoverImage(e.target.value)}
+        <div className="p-8 space-y-6">
+          {/* Input Judul */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700"><Type size={16} /> Judul Artikel</label>
+            <input
+              type="text"
+              value={tittle}
+              onChange={(e) => setTittle(e.target.value)}
+              placeholder="Masukkan judul (tittle)..."
+              className="w-full text-3xl font-bold border-none focus:ring-0 placeholder:text-gray-200"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Input Author */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700"><User size={16} /> Penulis</label>
+              <input
+                type="text"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="Nama penulis..."
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 transition-all"
+              />
+            </div>
+
+            {/* Area Upload Gambar */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700"><Upload size={16} /> Gambar Sampul</label>
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="relative cursor-pointer group h-12 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all overflow-hidden"
+              >
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  accept="image/*" 
+                  className="hidden" 
                 />
+                
+                {selectedFile ? (
+                  <span className="text-sm text-blue-600 font-medium truncate px-4">
+                    {selectedFile.name}
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-400 flex items-center gap-2">
+                    <ImageIcon size={16} /> Pilih file gambar...
+                  </span>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Title Input */}
-          <input
-            type="text"
-            placeholder="New post title here..."
-            className="w-full text-4xl md:text-5xl font-extrabold bg-transparent border-none outline-none placeholder:text-gray-300 text-gray-900"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          {/* Preview Gambar Sebelum Upload */}
+          {previewUrl && (
+            <div className="relative w-full h-64 rounded-2xl overflow-hidden border">
+              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+              <button 
+                onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
+                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
 
-          {/* Category Selector */}
-          <div className="flex items-center gap-4">
-            <select 
-              className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 outline-none focus:ring-2 ring-blue-500/20"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">Select Category</option>
-              <option value="tech">Technology</option>
-              <option value="lifestyle">Lifestyle</option>
-              <option value="education">Education</option>
-            </select>
-            <span className="text-xs text-gray-400"># Use clear tags for better reach</span>
-          </div>
-
-          {/* WYSIWYG Editor Container */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <ReactQuill 
+          {/* Editor Content */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Isi Konten</label>
+            <ReactQuill
               theme="snow"
               value={content}
               onChange={setContent}
-              modules={modules}
-              placeholder="Write your story here..."
-              className="h-[400px] mb-12" // Margin bottom agar toolbar tidak menutupi teks terakhir
+              className="h-80 mb-12"
+              placeholder="Tulis isi blog di sini..."
             />
           </div>
-        </form>
-      </main>
-
-      {/* Global CSS for Quill Overrides */}
-      <style>{`
-        .ql-container {
-          font-size: 1.125rem;
-          font-family: inherit;
-          border: none !important;
-        }
-        .ql-toolbar {
-          border: none !important;
-          border-bottom: 1px solid #e5e7eb !important;
-          padding: 0.75rem !important;
-          position: sticky;
-          top: 64px;
-          z-index: 5;
-          background: white;
-        }
-        .ql-editor.ql-blank::before {
-          color: #d1d5db;
-          font-style: normal;
-        }
-        .ql-editor {
-          min-height: 400px;
-          padding: 2rem !important;
-        }
-      `}</style>
+        </div>
+      </div>
     </div>
   );
 };
