@@ -57,6 +57,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardBlog />} />
             <Route path="/create-blog" element={<CreateBlog />} />
+            <Route path="/edit-blog/:id" element={<CreateBlog />} />
           </Route>
           
         </Routes>

@@ -1,13 +1,27 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import Backendless from '../lib/backendless';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Save, Image as ImageIcon, User, Type, Upload, X } from 'lucide-react';
 
 const CreateBlog: React.FC = () => {
+
+  interface BlogData {
+    id: number;
+    tittle: string;
+    author: string;
+    content: string;
+    image: string;
+    created: number;
+    objectId: number;
+  }
+  
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { id } = useParams(); // Ambil ID jika sedang mode edit
+  const isEditMode = !!id;
   
   const [isLoading, setIsLoading] = useState(false);
   const [tittle, setTittle] = useState('');
@@ -27,53 +41,77 @@ const CreateBlog: React.FC = () => {
     }
   };
 
+  //Ambil data lama jika dalam mode edit
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchBlogDetail = async () => {
+        try {
+          const data:BlogData = await Backendless.Data.of("Blog").findById(id);
+          setTittle(data.tittle);
+          setAuthor(data.author);
+          setContent(data.content);
+          setPreviewUrl(data.image); // Tampilkan gambar yang sudah ada
+        } catch (error) {
+          console.error("Gagal mengambil detail blog:", error);
+        }
+      };
+      fetchBlogDetail();
+    }
+  }, [id, isEditMode]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) return alert("Silakan pilih gambar terlebih dahulu");
-    
     setIsLoading(true);
 
     try {
-      // TAHAP 1: Upload file ke Backendless File Service
-      // File akan disimpan di folder /blog-images/
-      const uploadResult = await Backendless.Files.upload(selectedFile, "blog-images", true);
-      const uploadedImageUrl = uploadResult.fileURL;
+      let uploadedImageUrl = previewUrl;
 
-      // TAHAP 2: Simpan data blog ke tabel 'Blog' dengan URL dari hasil upload
-      const payload = {
-        tittle: tittle,
-        author: author,
-        content: content,
-        image: uploadedImageUrl // URL hasil upload disimpan di sini
+      // TAHAP 1: Upload hanya jika user memilih file baru
+      if (selectedFile) {
+        const uploadResult = await Backendless.Files.upload(selectedFile, "blog-images", true);
+        uploadedImageUrl = uploadResult.fileURL;
+      }
+
+      // TAHAP 2: Save atau Update
+      const payload: any = {
+        tittle,
+        author,
+        content,
+        image: uploadedImageUrl
       };
 
-      await Backendless.Data.of("Blog").save(payload);
+      if (isEditMode) {
+        payload.objectId = id; // Tambahkan objectId untuk menandakan update
+        await Backendless.Data.of("Blog").save(payload);
+        alert("Blog berhasil diperbarui!");
+      } else {
+        await Backendless.Data.of("Blog").save(payload);
+        alert("Blog berhasil dipublish!");
+      }
       
-      alert("Blog berhasil dipublish dengan gambar!");
       navigate('/dashboard');
     } catch (error: any) {
-      console.error("Error:", error);
-      alert("Terjadi kesalahan: " + error.message);
+      alert("Error: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200">
+    <div className="min-h-screen px-4 py-12 bg-gray-50">
+      <div className="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-2xl">
         
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-20">
+        <div className="sticky top-0 z-20 flex items-center justify-between p-6 bg-white border-b border-gray-100">
           <Link to='/dashboard'>
             <X/>
           </Link>
-          <h1 className="text-xl font-bold text-gray-800">Tulis Artikel Baru</h1>
+          <h1 className="text-xl font-bold text-gray-800">{isEditMode ? "Edit Artikel" : "Tulis Artikel Baru"}</h1>
           <button
             onClick={handleSubmit}
-            disabled={isLoading || !tittle || !selectedFile}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:bg-gray-400"
+            disabled={isLoading || !tittle || (isEditMode?false:!selectedFile)}
+            className="flex items-center gap-2 px-6 py-2 font-semibold text-white transition-all bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400"
           >
-            {isLoading ? "Memproses..." : <><Save size={18} /> Publish</>}
+            {isLoading ? "Memproses..." : <><Save size={18} /> {isEditMode ? "Edit Artikel" : "Tulis Artikel Baru"}</>}
           </button>
         </div>
 
@@ -90,7 +128,7 @@ const CreateBlog: React.FC = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Input Author */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700"><User size={16} /> Penulis</label>
@@ -99,7 +137,7 @@ const CreateBlog: React.FC = () => {
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
                 placeholder="Nama penulis..."
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 transition-all"
+                className="w-full p-3 transition-all border border-gray-200 outline-none bg-gray-50 rounded-xl focus:border-blue-500"
               />
             </div>
 
@@ -108,7 +146,7 @@ const CreateBlog: React.FC = () => {
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700"><Upload size={16} /> Gambar Sampul</label>
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="relative cursor-pointer group h-12 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all overflow-hidden"
+                className="relative flex items-center justify-center h-12 overflow-hidden transition-all border-2 border-gray-300 border-dashed cursor-pointer group rounded-xl hover:border-blue-400 hover:bg-blue-50"
               >
                 <input 
                   type="file" 
@@ -119,11 +157,11 @@ const CreateBlog: React.FC = () => {
                 />
                 
                 {selectedFile ? (
-                  <span className="text-sm text-blue-600 font-medium truncate px-4">
+                  <span className="px-4 text-sm font-medium text-blue-600 truncate">
                     {selectedFile.name}
                   </span>
                 ) : (
-                  <span className="text-sm text-gray-400 flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-sm text-gray-400">
                     <ImageIcon size={16} /> Pilih file gambar...
                   </span>
                 )}
@@ -133,11 +171,11 @@ const CreateBlog: React.FC = () => {
 
           {/* Preview Gambar Sebelum Upload */}
           {previewUrl && (
-            <div className="relative w-full h-64 rounded-2xl overflow-hidden border">
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+            <div className="relative w-full h-64 overflow-hidden border rounded-2xl">
+              <img src={previewUrl} alt="Preview" className="object-cover w-full h-full" />
               <button 
                 onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                className="absolute p-1 text-white bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
               >
                 <X size={16} />
               </button>
@@ -151,7 +189,7 @@ const CreateBlog: React.FC = () => {
               theme="snow"
               value={content}
               onChange={setContent}
-              className="h-80 mb-12"
+              className="mb-12 h-80"
               placeholder="Tulis isi blog di sini..."
             />
           </div>

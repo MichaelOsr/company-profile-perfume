@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import Backendless from "@/lib/backendless"; // Import konfigurasi backendless kamu
-import { Loader2, Trash2, Eye } from "lucide-react";
+import { Loader2, Trash2, Eye, Edit2 } from "lucide-react";
 
 // Definisikan interface sesuai skema gambar sebelumnya
 interface BlogData {
@@ -14,47 +14,59 @@ interface BlogData {
   content: string;
   image: string;
   created: number;
+  objectId:number;
 }
 
 export default function DashboardBlog() {
-    const navigate = useNavigate();
-    const [blogs, setBlogs] = useState<BlogData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-  
-    // 1. Fetch Data
-    const fetchBlogs = async () => {
-      setIsLoading(true);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+
+  const navigate = useNavigate();
+  const [blogs, setBlogs] = useState<BlogData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 1. Fetch Data
+  const fetchBlogs = async () => {
+    setIsLoading(true);
+    try {
+      const queryBuilder = Backendless.DataQueryBuilder.create().setSortBy(["created DESC"]);
+      const data = await Backendless.Data.of("Blog").find(queryBuilder);
+      setBlogs(data as BlogData[]);
+    } catch (error) {
+      console.error("Gagal mengambil data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const getRoles = async () => {
       try {
-        const queryBuilder = Backendless.DataQueryBuilder.create().setSortBy(["created DESC"]);
-        const data = await Backendless.Data.of("Blog").find(queryBuilder);
-        setBlogs(data as BlogData[]);
-      } catch (error) {
-        console.error("Gagal mengambil data:", error);
-      } finally {
-        setIsLoading(false);
+        const roles = await Backendless.UserService.getUserRoles();
+        setUserRoles(roles);
+      } catch (err) {
+        console.error(err);
       }
     };
+    getRoles();
+    fetchBlogs();
+  }, []);
+
   
-    useEffect(() => {
-      fetchBlogs();
-    }, []);
-  
-    // 2. Fungsi Delete Blog (DIPERBARUI)
-    const handleDelete = async (id: number) => {
-      if (window.confirm("Apakah Anda yakin ingin menghapus blog ini?")) {
-        try {
-          // Menggunakan whereClause karena menghapus berdasarkan kolom 'id' kustom
-          await Backendless.Data.of("Blog").bulkDelete(`id = ${id}`);
-          
-          // Update state lokal agar langsung hilang dari UI tanpa reload
-          setBlogs(prev => prev.filter((blog) => blog.id !== id));
-          alert("Blog berhasil dihapus");
-        } catch (error: any) {
-          console.error("Delete error:", error);
-          alert("Gagal menghapus blog: " + error.message);
-        }
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus blog ini?")) {
+      try {
+       
+        await Backendless.Data.of("Blog").bulkDelete(`id = ${id}`);
+        
+        // Update state lokal agar langsung hilang dari UI tanpa reload
+        setBlogs(prev => prev.filter((blog) => blog.id !== id));
+        alert("Blog berhasil dihapus");
+      } catch (error: any) {
+        console.error("Delete error:", error);
+        alert("Gagal menghapus blog: " + error.message);
       }
-    };
+    }
+  };
   
 
   const handleLogout = async () => {
@@ -67,6 +79,8 @@ export default function DashboardBlog() {
       navigate('/login');
     }
   };
+
+  const canDelete = userRoles.includes("Admin_Super");
 
   return (
     <>
@@ -128,15 +142,24 @@ export default function DashboardBlog() {
                       </Link>
                     </Button>
 
-                    {/* Tombol Delete */}
-                    <Button 
-                      variant="destructive" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => handleDelete(blog.id)}
-                    >
-                      <Trash2 size={14} className="mr-1" /> Delete
+                    {/* Tombol Edit */}
+                    <Button variant="outline" size="sm" asChild className="flex-1">
+                      <Link to={`/edit-blog/${blog.objectId}`}> {/* Pakai objectId dari Backendless */}
+                        <Edit2 size={14} className="mr-1" /> Edit
+                      </Link>
                     </Button>
+
+                    {/* Tombol Delete hanya muncul jika Admin_Super */}
+                    {canDelete && (
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => handleDelete(blog.id)}
+                      >
+                        <Trash2 size={14} className="mr-1" /> Delete
+                      </Button>
+                    )}
                   </CardFooter>
                 </Card>
               ))}
