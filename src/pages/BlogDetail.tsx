@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router'; // Pastikan menggunakan react-ro
 import { ArrowLeft, Calendar, User, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Backendless from '@/lib/backendless'; // Sesuaikan path init Backendless kamu
+import ReactQuill from 'react-quill-new';
 
 // Pastikan interface sesuai dengan skema
 interface BlogPost {
@@ -43,42 +44,42 @@ export default function BlogDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <Loader2 className="text-blue-600 animate-spin" size={40} />
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-gray-50">
         <h1 className="text-2xl font-bold">Artikel tidak ditemukan</h1>
-        <Link to="/blog" className="text-blue-600 hover:underline mt-4"> Kemabli ke Daftar Blog</Link>
+        <Link to="/blog" className="mt-4 text-blue-600 hover:underline"> Kemabli ke Daftar Blog</Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 pb-20">
+    <div className="min-h-screen px-4 pb-20 bg-gray-50">
       {/* Container Utama untuk Responsivitas */}
-      <div className="max-w-4xl mx-auto pt-8">
+      <div className="max-w-4xl pt-8 mx-auto">
         
         {/* Navigation - Rapi di Mobile/Desktop */}
         <Link 
           to="/blog" 
-          className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors mb-10 group"
+          className="flex items-center mb-10 text-sm text-gray-500 transition-colors hover:text-blue-600 group"
         >
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
           Daftar Artikel
         </Link>
 
         {/* Article Header */}
         <header className="mb-12 space-y-4"> 
-          <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+          <h1 className="text-3xl font-extrabold leading-tight text-gray-900 md:text-5xl">
             {post.tittle}
           </h1>
           
-          <div className="flex flex-wrap items-center gap-6 text-gray-500 text-sm border-b border-gray-100 pb-6">
+          <div className="flex flex-wrap items-center gap-6 pb-6 text-sm text-gray-500 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
               <span>{post.author}</span>
@@ -97,27 +98,24 @@ export default function BlogDetail() {
         </header>
 
         {/* Featured Image - Responsif dan Rapi */}
-        <div className="mb-16 rounded-3xl overflow-hidden shadow-2xl shadow-blue-50/50">
+        <div className="mb-16 overflow-hidden shadow-2xl rounded-3xl shadow-blue-50/50">
           <img 
             src={post.image} 
             alt={post.tittle} 
-            className="w-full h-auto max-h-150 object-cover"
+            className="object-cover w-full h-auto max-h-150"
           />
         </div>
 
         {/* Article Content */}
-        <main className="max-w-3xl mx-auto px-4 pb-20 mt-10">
-        <article 
-            className="
-            prose prose-blue lg:prose-xl 
-            max-w-none 
-            text-gray-800 
-            leading-relaxed 
-            break-words 
-            whitespace-pre-wrap
-            "
-            dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <main className="max-w-3xl pb-20 mx-auto">
+          <div className="quill-content">
+            <ReactQuill
+              value={post.content}
+              readOnly={true}
+              theme="bubble" // Menggunakan bubble karena tidak ada toolbar bawaan yang mengganggu
+              modules={{ toolbar: false }} // Mematikan toolbar sepenuhnya
+            />
+          </div>
         </main>
       </div>
     </div>
