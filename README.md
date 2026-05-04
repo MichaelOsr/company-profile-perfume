@@ -73,5 +73,6 @@ export default defineConfig([
 ```
 
 ## Roles Admin
+Access Route : https://elixir-perfume-prem.vercel.app/login
 Admin1@admin.com | 123456 
 Admin2@admin.com | 123456 
